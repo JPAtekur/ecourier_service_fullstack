@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class TrackingService {
         // Verify parcel exists and user has access
         ParcelDto parcel = parcelClient.getParcel(
                 request.getParcelId(),
-                SecurityContextHolder.getContext().getAuthentication().getCredentials().toString()
+                "Bearer " + SecurityContextHolder.getContext().getAuthentication().getCredentials().toString()
         );
 
         // Validate status transition
@@ -62,6 +63,19 @@ public class TrackingService {
                             currentStatus, newStatus)
             );
         }
+    }
+
+    public List<TrackingEntryDto> getTrackingHistory(Long parcelId) {
+        return trackingRepository.findByParcelIdOrderByCreatedAtDesc(parcelId)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    public TrackingEntryDto getLatestTracking(Long parcelId) {
+        return trackingRepository.findFirstByParcelIdOrderByCreatedAtDesc(parcelId)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new IllegalStateException("No tracking found for parcel: " + parcelId));
     }
 
     private TrackingEntryDto mapToDto(TrackingEntry entry) {

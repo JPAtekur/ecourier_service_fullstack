@@ -1,8 +1,10 @@
 package com.ecourier.trackingservice.controller;
 
 import com.ecourier.trackingservice.dto.CreateTrackingRequest;
+import com.ecourier.trackingservice.dto.TestDto;
 import com.ecourier.trackingservice.dto.TrackingEntryDto;
 import com.ecourier.trackingservice.service.TrackingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +22,7 @@ public class TrackingController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'AGENT')")
     public ResponseEntity<TrackingEntryDto> createTracking(
-            @RequestBody CreateTrackingRequest request,
+            @Valid @RequestBody CreateTrackingRequest request,
             Authentication auth) {
         return ResponseEntity.ok(trackingService.createTracking(request, auth.getName()));
     }
