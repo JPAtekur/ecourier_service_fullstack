@@ -8,6 +8,7 @@ import com.ecourier.parcelservice.entity.Parcel;
 import com.ecourier.parcelservice.service.ParcelService;
 import com.ecourier.parcelservice.service.UserClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,6 +54,24 @@ public class ParcelController {
     public String assignAgent(@RequestBody AssignAgentRequest request) {
         parcelService.assignAgentToParcel(request.getParcelId(), request.getAgentEmail());
         return "Agent assigned successfully.";
+    }
+
+    @GetMapping("/{id}")
+    public Parcel getParcelById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        String token = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
+        UserDto userDto = userClient.getUserInfo(email, "Bearer " + token);
+
+        Parcel parcel = parcelService.getParcelById(id);
+
+        // Only allow access if user is ADMIN, AGENT, or the parcel owner
+        if (userDto.getRole().equals("ADMIN") ||
+                userDto.getRole().equals("AGENT") ||
+                parcel.getSenderId().equals(email)) {
+            return parcel;
+        }
+
+        throw new AccessDeniedException("You don't have permission to view this parcel");
     }
 
 }

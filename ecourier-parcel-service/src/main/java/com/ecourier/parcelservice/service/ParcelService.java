@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -79,6 +80,12 @@ public class ParcelService {
 
         parcel.setAssignedAgentId(agentEmail);
         parcelRepository.save(parcel);
+    }
+
+    @Transactional(readOnly = true)
+    public Parcel getParcelById(Long id) {
+        return parcelRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Parcel not found with id: " + id));
     }
 
 }
