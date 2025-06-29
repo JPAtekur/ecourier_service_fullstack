@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecourier_db
+    username: ecourier_app
+    password: ecourier_app_db_pass
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+# enable debug logging for spring security
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+jwt:
+  secret: "jwt_secret_keyaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
