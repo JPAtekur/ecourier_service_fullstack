@@ -1,7 +1,6 @@
 package com.ecourier.trackingservice.controller;
 
 import com.ecourier.trackingservice.dto.CreateTrackingRequest;
-import com.ecourier.trackingservice.dto.TestDto;
 import com.ecourier.trackingservice.dto.TrackingEntryDto;
 import com.ecourier.trackingservice.service.TrackingService;
 import jakarta.validation.Valid;
