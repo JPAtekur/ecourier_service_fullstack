@@ -3,13 +3,15 @@ package com.ecourier.trackingservice.service;
 import com.ecourier.trackingservice.dto.CreateTrackingRequest;
 import com.ecourier.trackingservice.dto.ParcelDto;
 import com.ecourier.trackingservice.dto.TrackingEntryDto;
+import com.ecourier.trackingservice.dto.UpdateStatusRequest;
 import com.ecourier.trackingservice.entity.TrackingEntry;
 import com.ecourier.trackingservice.repository.TrackingRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +43,18 @@ public class TrackingService {
         entry.setDescription(request.getDescription());
         entry.setUpdatedBy(userEmail);
         entry.setCreatedAt(LocalDateTime.now());
+
+
+        ResponseEntity<String> response = parcelClient.updateParcelStatus(
+                request.getParcelId(),
+                "Bearer " + SecurityContextHolder.getContext().getAuthentication().getCredentials().toString(),
+                new UpdateStatusRequest(request.getStatus())
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.error("Failed to update parcel status: {}", response.getBody());
+            throw new RuntimeException("Failed to update parcel status");
+        }
 
         TrackingEntry saved = trackingRepository.save(entry);
         log.info("Created tracking entry for parcel {} with status {}",
