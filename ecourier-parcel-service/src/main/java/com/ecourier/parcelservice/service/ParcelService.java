@@ -37,6 +37,7 @@ public class ParcelService {
         parcelRepository.save(parcel);
     }
 
+    @Transactional
     public void updateStatus(Long id, String userEmail, UpdateStatusRequest request) {
         Parcel parcel = parcelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Parcel not found"));

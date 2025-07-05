@@ -8,6 +8,7 @@ import com.ecourier.parcelservice.entity.Parcel;
 import com.ecourier.parcelservice.service.ParcelService;
 import com.ecourier.parcelservice.service.UserClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,11 +35,11 @@ public class ParcelController {
 
     @PutMapping("/update-status/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('AGENT')")
-    public String updateStatus(@AuthenticationPrincipal UserDetails userDetails,
-                               @PathVariable Long id,
-                               @RequestBody UpdateStatusRequest request) {
+    public ResponseEntity<String> updateStatus(@AuthenticationPrincipal UserDetails userDetails,
+                                       @PathVariable Long id,
+                                       @RequestBody UpdateStatusRequest request) {
         parcelService.updateStatus(id, userDetails.getUsername(), request);
-        return "Parcel status updated";
+        return ResponseEntity.ok("Parcel status updated");
     }
 
     @GetMapping("/my-parcels")
